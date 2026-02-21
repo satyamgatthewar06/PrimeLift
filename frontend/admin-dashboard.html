@@ -293,7 +293,7 @@
     </div>
 
     <script>
-        const API = window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : 'https://primelift-api-production.up.railway.app/api';
+        const API = window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : 'https://primelift-backend-v2-production.up.railway.app/api';
         let token = localStorage.getItem('token');
         let user = JSON.parse(localStorage.getItem('user') || '{}');
         let allRides = [], currentStatusFilter = '';
