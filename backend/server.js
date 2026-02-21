@@ -18,18 +18,25 @@ app.use((req, res, next) => {
 
     console.log(`${new Date().toISOString()} [${req.method}] ${req.url} - Origin: ${origin}`);
 
+    // Debug header to see what reached the middleware
+    res.header('X-Original-Origin', origin || 'none');
+
     // If matches specific list or ends with .netlify.app
-    if (origin && (allowedOrigins.includes(origin) || origin.endsWith('.netlify.app') || origin.includes('localhost') || origin.includes('127.0.0.1'))) {
+    const isAllowed = origin && (
+        allowedOrigins.includes(origin) ||
+        origin.endsWith('.netlify.app') ||
+        origin.includes('localhost') ||
+        origin.includes('127.0.0.1')
+    );
+
+    if (isAllowed || origin) {
         res.header('Access-Control-Allow-Origin', origin);
         res.header('Access-Control-Allow-Credentials', 'true');
-    } else if (origin) {
-        // Fallback for debug if needed
-        res.header('Access-Control-Allow-Origin', origin);
-        res.header('Access-Control-Allow-Credentials', 'true');
+        res.header('X-CORS-Allowed', 'true');
     }
 
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
     res.header('Vary', 'Origin');
 
     // Handle preflight
