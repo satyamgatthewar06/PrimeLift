@@ -63,14 +63,16 @@ app.get('*', (req, res) => {
 const PORT = process.env.PORT || 5000;
 const initDatabase = require('./config/initdb');
 
-initDatabase().then(() => {
-    app.listen(PORT, () => {
-        console.log(`🚗 ================================`);
-        console.log(`   RideBooking Server Running`);
-        console.log(`   http://localhost:${PORT}`);
-        console.log(`🚗 ================================\n`);
-    });
-}).catch(err => {
-    console.error('❌ Database setup failed:', err.message);
-    process.exit(1);
+// Listen immediately to prevent 502 errors on Railway/Netlify
+app.listen(PORT, () => {
+    console.log(`🚗 ================================`);
+    console.log(`   RideBooking Server Running`);
+    console.log(`   Internal Port: ${PORT}`);
+    console.log(`   Health: http://localhost:${PORT}/api/health`);
+    console.log(`🚗 ================================\n`);
+
+    // Run DB initialization in background
+    initDatabase()
+        .then(() => console.log('✅ Database initialized successfully'))
+        .catch(err => console.error('❌ Database initialization failed:', err.message));
 });
