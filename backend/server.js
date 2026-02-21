@@ -6,8 +6,23 @@ const path = require('path');
 const app = express();
 
 // ---- Middleware ----
+const allowedOrigins = [
+    'https://primelift-app.netlify.app',
+    'http://localhost:5500',
+    'http://localhost:5000',
+    'http://127.0.0.1:5500'
+];
+
 app.use(cors({
-    origin: '*', // Allow all for now to ensure it works, then we can restrict if needed
+    origin: function (origin, callback) {
+        // allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.indexOf(origin) === -1) {
+            const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+            return callback(new Error(msg), false);
+        }
+        return callback(null, true);
+    },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
