@@ -7,41 +7,38 @@ const app = express();
 
 // ---- Middleware ----
 app.use((req, res, next) => {
-    console.log(`${new Date().toISOString()} [${req.method}] ${req.url} - Origin: ${req.headers.origin}`);
+    const origin = req.headers.origin;
+    const allowedOrigins = [
+        'https://primelift-app.netlify.app',
+        'http://localhost:5500',
+        'http://localhost:5000',
+        'http://127.0.0.1:5500',
+        'http://localhost:3000'
+    ];
+
+    console.log(`${new Date().toISOString()} [${req.method}] ${req.url} - Origin: ${origin}`);
+
+    // If matches specific list or ends with .netlify.app
+    if (origin && (allowedOrigins.includes(origin) || origin.endsWith('.netlify.app') || origin.includes('localhost') || origin.includes('127.0.0.1'))) {
+        res.header('Access-Control-Allow-Origin', origin);
+        res.header('Access-Control-Allow-Credentials', 'true');
+    } else if (origin) {
+        // Fallback for debug if needed
+        res.header('Access-Control-Allow-Origin', origin);
+        res.header('Access-Control-Allow-Credentials', 'true');
+    }
+
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept');
+    res.header('Vary', 'Origin');
+
+    // Handle preflight
+    if (req.method === 'OPTIONS') {
+        return res.status(200).send();
+    }
     next();
 });
 
-const allowedOrigins = [
-    'https://primelift-app.netlify.app',
-    'http://localhost:5500',
-    'http://localhost:5000',
-    'http://127.0.0.1:5500',
-    'http://localhost:3000'
-];
-
-app.use(cors({
-    origin: function (origin, callback) {
-        // Allow requests with no origin (like mobile apps or curl)
-        if (!origin) return callback(null, true);
-
-        const isAllowed = allowedOrigins.includes(origin) ||
-            origin.endsWith('.netlify.app') ||
-            origin.includes('localhost') ||
-            origin.includes('127.0.0.1');
-
-        if (isAllowed) {
-            callback(null, true);
-        } else {
-            // For debugging, allow it but log it
-            console.warn(`⚠️ Blocked Origin: ${origin}`);
-            callback(null, true); // Temporarily allow all during debug phase
-        }
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
-    optionsSuccessStatus: 200 // Some legacy browsers (IE11, various SmartTVs) choke on 204
-}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
