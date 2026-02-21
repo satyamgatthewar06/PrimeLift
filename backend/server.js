@@ -14,7 +14,7 @@ const allowedOrigins = [
     'http://127.0.0.1:5500'
 ];
 
-app.use(cors({
+const corsConfig = {
     origin: function (origin, callback) {
         // Allow requests with no origin (like mobile apps)
         if (!origin) return callback(null, true);
@@ -22,15 +22,16 @@ app.use(cors({
         if (allowedOrigins.indexOf(origin) !== -1 || origin.endsWith('.netlify.app')) {
             callback(null, true);
         } else {
-            // Instead of an error, just send false to deny CORS without crashing
             callback(null, false);
         }
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
-}));
-app.options('*', cors()); // Enable pre-flight for all routes
+};
+
+app.use(cors(corsConfig));
+app.options('*', cors(corsConfig)); // Explicitly use the same config for pre-flight
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
