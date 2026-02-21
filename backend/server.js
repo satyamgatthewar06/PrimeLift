@@ -6,40 +6,28 @@ const path = require('path');
 const app = express();
 
 // ---- Middleware ----
+// ---- Middleware ----
 app.use((req, res, next) => {
     const origin = req.headers.origin;
-    const allowedOrigins = [
-        'https://primelift-app.netlify.app',
-        'http://localhost:5500',
-        'http://localhost:5000',
-        'http://127.0.0.1:5500',
-        'http://localhost:3000'
-    ];
 
+    // Log every request for debugging
     console.log(`${new Date().toISOString()} [${req.method}] ${req.url} - Origin: ${origin}`);
 
-    // Debug header to see what reached the middleware
-    res.header('X-Original-Origin', origin || 'none');
-
-    // If matches specific list or ends with .netlify.app
-    const isAllowed = origin && (
-        allowedOrigins.includes(origin) ||
-        origin.endsWith('.netlify.app') ||
-        origin.includes('localhost') ||
-        origin.includes('127.0.0.1')
-    );
-
-    if (isAllowed || origin) {
-        res.header('Access-Control-Allow-Origin', origin);
-        res.header('Access-Control-Allow-Credentials', 'true');
-        res.header('X-CORS-Allowed', 'true');
+    // Reflect any origin with credentials to definitively solve CORS issues
+    if (origin) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
+    } else {
+        res.setHeader('Access-Control-Allow-Origin', '*');
     }
 
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
-    res.header('Vary', 'Origin');
+    // Comprehensive list of methods and headers
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Authorization, Accept, Origin, Token, x-requested-with');
+    res.setHeader('Access-Control-Max-Age', '86400'); // Cache preflight for 24 hours
+    res.setHeader('Vary', 'Origin');
 
-    // Handle preflight
+    // Early exit for preflight requests
     if (req.method === 'OPTIONS') {
         return res.status(200).send();
     }
