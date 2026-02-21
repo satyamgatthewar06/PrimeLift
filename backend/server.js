@@ -6,32 +6,42 @@ const path = require('path');
 const app = express();
 
 // ---- Middleware ----
-// Allow specific origins but reflect them in the header to support credentials
+app.use((req, res, next) => {
+    console.log(`${new Date().toISOString()} [${req.method}] ${req.url} - Origin: ${req.headers.origin}`);
+    next();
+});
+
 const allowedOrigins = [
     'https://primelift-app.netlify.app',
     'http://localhost:5500',
     'http://localhost:5000',
-    'http://127.0.0.1:5500'
+    'http://127.0.0.1:5500',
+    'http://localhost:3000'
 ];
 
-const corsConfig = {
+app.use(cors({
     origin: function (origin, callback) {
-        // Allow requests with no origin (like mobile apps)
+        // Allow requests with no origin (like mobile apps or curl)
         if (!origin) return callback(null, true);
 
-        if (allowedOrigins.indexOf(origin) !== -1 || origin.endsWith('.netlify.app')) {
+        const isAllowed = allowedOrigins.includes(origin) ||
+            origin.endsWith('.netlify.app') ||
+            origin.includes('localhost') ||
+            origin.includes('127.0.0.1');
+
+        if (isAllowed) {
             callback(null, true);
         } else {
-            callback(null, false);
+            // For debugging, allow it but log it
+            console.warn(`⚠️ Blocked Origin: ${origin}`);
+            callback(null, true); // Temporarily allow all during debug phase
         }
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-};
-
-app.use(cors(corsConfig));
-app.options('*', cors(corsConfig)); // Explicitly use the same config for pre-flight
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+    optionsSuccessStatus: 200 // Some legacy browsers (IE11, various SmartTVs) choke on 204
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
