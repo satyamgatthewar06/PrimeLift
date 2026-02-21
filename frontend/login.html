@@ -278,7 +278,7 @@
                     </div>
                     <div id="otpStep2" style="display:none;">
                         <div style="text-align:center;color:var(--text-muted);font-size:0.85rem;margin-bottom:12px;">
-                            Enter the 6-digit OTP sent to <strong id="otpPhoneDisplay">—</strong>
+                            Enter the 6-digit code sent to your **registered email** 📧
                         </div>
                         <div class="otp-row" id="otpInputs">
                             <input type="text" maxlength="1" oninput="otpNext(this,1)" />
@@ -301,7 +301,8 @@
                     Admin: admin@ride.com / password<br />
                     Rider: rider@ride.com / password<br />
                     Driver: driver@ride.com / password<br />
-                    <em>OTP: any 10-digit number, OTP shown in console</em>
+                    <em>OTP: Enter phone of demo user → Get real code in
+                        <strong>satyamgatthewar06@gmail.com</strong></em>
                 </div>
             </div>
 
@@ -432,12 +433,9 @@
                 const res = await fetch(`${API}/auth/send-otp`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phone }) });
                 const data = await res.json();
                 if (!data.success) { showMsg(data.message, 'danger'); return; }
-                sentOtp = data.demo_otp || '';
                 document.getElementById('otpStep1').style.display = 'none';
                 document.getElementById('otpStep2').style.display = 'block';
-                document.getElementById('otpPhoneDisplay').textContent = '+91 ' + phone;
-                if (sentOtp) document.getElementById('otpDemo').textContent = `Demo OTP: ${sentOtp}`;
-                showMsg('OTP sent successfully!', 'success');
+                showMsg('OTP sent to your registered email!', 'success');
             } catch (e) { showMsg('Connection error.', 'danger'); } finally { setLoading('sendOtpBtn', false, 'Send OTP'); }
         }
 
