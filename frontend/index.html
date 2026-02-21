@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PrimeLift – Fast, Safe & Affordable Rides</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <style>
+        /* ---- HERO ---- */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            background: radial-gradient(ellipse at 30% 50%, rgba(230, 57, 70, 0.12) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 50%, rgba(255, 107, 107, 0.08) 0%, transparent 60%),
+                var(--bg);
+            padding-top: 72px;
+        }
+
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        .hero-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: clamp(2.4rem, 5vw, 4rem);
+            font-weight: 900;
+            line-height: 1.15;
+        }
+
+        .hero-title .highlight {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-sub {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin: 20px 0 32px;
+            line-height: 1.7;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        /* Animated car SVG panel */
+        .hero-visual {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hero-card {
+            background: var(--glass);
+            border: var(--glass-b);
+            border-radius: 24px;
+            padding: 32px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(108, 99, 255, 0.15);
+            width: 340px;
+            animation: floatCard 4s ease-in-out infinite;
+        }
+
+        @keyframes floatCard {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-12px);
+            }
+        }
+
+        .car-svg {
+            width: 100%;
+            filter: drop-shadow(0 10px 30px rgba(108, 99, 255, 0.5));
+        }
+
+        .hero-card-info {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .ride-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 0.88rem;
+        }
+
+        .ride-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .ride-dot.green {
+            background: var(--accent);
+            box-shadow: 0 0 8px var(--accent);
+        }
+
+        .ride-dot.red {
+            background: var(--accent2);
+            box-shadow: 0 0 8px var(--accent2);
+        }
+
+        .ride-bar-label {
+            color: var(--text-muted);
+            font-size: 0.78rem;
+        }
+
+        .fare-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px;
+            background: rgba(108, 99, 255, 0.12);
+            border-radius: 10px;
+            border: 1px solid rgba(108, 99, 255, 0.25);
+        }
+
+        .fare-amount {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .fare-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Floating decorators */
+        .bg-circle {
+            position: absolute;
+            border-radius: 50%;
+            animation: floatBg 10s linear infinite alternate;
+            pointer-events: none;
+        }
+
+        .bg-circle-1 {
+            width: 400px;
+            height: 400px;
+            left: -200px;
+            top: 20%;
+            background: rgba(230, 57, 70, 0.04);
+        }
+
+        .bg-circle-2 {
+            width: 300px;
+            height: 300px;
+            right: -100px;
+            bottom: 10%;
+            background: rgba(255, 107, 107, 0.04);
+        }
+
+        @keyframes floatBg {
+            from {
+                transform: scale(1);
+            }
+
+            to {
+                transform: scale(1.2);
+            }
+        }
+
+        /* Stats strip */
+        .stats-strip {
+            background: var(--bg2);
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 24px 40px;
+        }
+
+        .stats-strip-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-around;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .strip-stat {
+            text-align: center;
+        }
+
+        .strip-stat .num {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .strip-stat .lbl {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Features */
+        .features {
+            padding: 80px 40px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .section-sub {
+            color: var(--text-muted);
+            margin-bottom: 48px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+        }
+
+        .feature-card {
+            background: var(--glass);
+            border: var(--glass-b);
+            border-radius: var(--radius);
+            padding: 28px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: -40px;
+            left: -40px;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+        }
+
+        .feature-card.c1::before {
+            background: rgba(230, 57, 70, 0.1);
+        }
+
+        .feature-card.c2::before {
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        .feature-card.c3::before {
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        .feature-card.c4::before {
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        .f-icon {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+            display: block;
+            position: relative;
+            z-index: 1;
+        }
+
+        .f-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .f-text {
+            color: var(--text-muted);
+            font-size: 0.88rem;
+            line-height: 1.6;
+        }
+
+        /* Vehicles */
+        .vehicles-section {
+            background: var(--bg2);
+            padding: 80px 40px;
+        }
+
+        .vehicles-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .vehicles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .v-card {
+            background: var(--glass);
+            border: var(--glass-b);
+            border-radius: var(--radius);
+            padding: 28px 20px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .v-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--primary);
+            box-shadow: var(--glow);
+        }
+
+        .v-emoji {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 12px;
+        }
+
+        .v-type {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .v-price {
+            color: var(--accent);
+            font-size: 0.88rem;
+            font-weight: 600;
+        }
+
+        .v-desc {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            margin-top: 8px;
+        }
+
+        /* CTA */
+        .cta-section {
+            padding: 80px 40px;
+            text-align: center;
+            background: radial-gradient(ellipse at center, rgba(230, 57, 70, 0.12) 0%, transparent 70%);
+        }
+
+        .cta-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.4rem;
+            font-weight: 800;
+            margin-bottom: 16px;
+        }
+
+        .cta-sub {
+            color: var(--text-muted);
+            margin-bottom: 36px;
+            font-size: 1.05rem;
+        }
+
+        .cta-actions {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--bg2);
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 32px 40px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.88rem;
+        }
+
+        footer .logo {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        @media (max-width: 768px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .hero-visual {
+                display: none;
+            }
+
+            .hero-title {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ---- NAVBAR ---- -->
+    <nav class="navbar">
+        <div class="navbar-brand">🚗 PrimeLift</div>
+        <ul class="navbar-nav">
+            <li><a href="#features">Features</a></li>
+            <li><a href="#vehicles">Vehicles</a></li>
+            <li><a href="login.html">Login</a></li>
+        </ul>
+        <div class="navbar-actions">
+            <a href="login.html" class="btn btn-outline btn-sm">Sign In</a>
+            <a href="login.html?tab=register" class="btn btn-primary btn-sm">Get Started</a>
+        </div>
+    </nav>
+
+    <!-- ---- HERO ---- -->
+    <section class="hero">
+        <div class="bg-circle bg-circle-1"></div>
+        <div class="bg-circle bg-circle-2"></div>
+
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1 class="hero-title">
+                    Your Ride,<br />
+                    Your Way <span class="highlight">– Anywhere</span>
+                </h1>
+                <p class="hero-sub">
+                    Book a safe, fast, and affordable ride in seconds. Trusted by thousands of riders across the city.
+                    Multiple vehicle options, real-time tracking, and transparent pricing.
+                </p>
+                <div class="hero-actions">
+                    <a href="login.html?tab=register" class="btn btn-primary">🚀 Book a Ride</a>
+                    <a href="login.html?tab=register&role=driver" class="btn btn-outline">🚗 Drive with Us</a>
+                </div>
+            </div>
+
+            <div class="hero-visual">
+                <div class="hero-card">
+                    <!-- Animated SVG Car -->
+                    <svg class="car-svg" viewBox="0 0 300 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="bodyG" x1="0" y1="0" x2="1" y2="0">
+                                <stop offset="0%" stop-color="#e63946" />
+                                <stop offset="100%" stop-color="#ff6b6b" />
+                            </linearGradient>
+                            <filter id="glow2">
+                                <feGaussianBlur stdDeviation="4" result="b" />
+                                <feMerge>
+                                    <feMergeNode in="b" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+                        </defs>
+                        <!-- Road -->
+                        <rect x="0" y="130" width="300" height="30" fill="#1a1d2e" />
+                        <rect x="0" y="143" width="300" height="4" fill="#2a2d3e" />
+                        <!-- Dashes -->
+                        <rect x="20" y="143" width="30" height="4" fill="#e63946" opacity="0.5" rx="2">
+                            <animateTransform attributeName="transform" type="translate" from="0 0" to="-60 0" dur="1s"
+                                repeatCount="indefinite" />
+                        </rect>
+                        <rect x="80" y="143" width="30" height="4" fill="#e63946" opacity="0.5" rx="2">
+                            <animateTransform attributeName="transform" type="translate" from="0 0" to="-60 0" dur="1s"
+                                repeatCount="indefinite" />
+                        </rect>
+                        <rect x="140" y="143" width="30" height="4" fill="#e63946" opacity="0.5" rx="2">
+                            <animateTransform attributeName="transform" type="translate" from="0 0" to="-60 0" dur="1s"
+                                repeatCount="indefinite" />
+                        </rect>
+                        <rect x="200" y="143" width="30" height="4" fill="#e63946" opacity="0.5" rx="2">
+                            <animateTransform attributeName="transform" type="translate" from="0 0" to="-60 0" dur="1s"
+                                repeatCount="indefinite" />
+                        </rect>
+                        <rect x="260" y="143" width="30" height="4" fill="#e63946" opacity="0.5" rx="2">
+                            <animateTransform attributeName="transform" type="translate" from="0 0" to="-60 0" dur="1s"
+                                repeatCount="indefinite" />
+                        </rect>
+
+                        <!-- Car body -->
+                        <rect x="40" y="90" width="220" height="45" rx="12" fill="url(#bodyG)" filter="url(#glow2)" />
+                        <!-- Roof -->
+                        <path d="M85 90 Q100 55 140 50 Q180 45 215 90Z" fill="url(#bodyG)" opacity="0.9"
+                            filter="url(#glow2)" />
+                        <!-- Windows -->
+                        <path d="M95 87 Q105 63 130 60 Q150 58 168 87Z" fill="rgba(255,255,255,0.15)" rx="4" />
+                        <path d="M172 87 Q178 60 208 63 L210 87Z" fill="rgba(255,255,255,0.1)" rx="4" />
+                        <!-- Headlights -->
+                        <rect x="250" y="102" width="14" height="10" rx="4" fill="#ffd700" filter="url(#glow2)" />
+                        <rect x="37" y="102" width="10" height="10" rx="4" fill="#ff4757" opacity="0.8" />
+                        <!-- Wheels -->
+                        <circle cx="92" cy="135" r="16" fill="#111111" stroke="#e63946" stroke-width="3" />
+                        <circle cx="92" cy="135" r="7" fill="#0a0a0a">
+                            <animateTransform attributeName="transform" type="rotate" from="0 92 135" to="360 92 135"
+                                dur="0.8s" repeatCount="indefinite" />
+                        </circle>
+                        <circle cx="208" cy="135" r="16" fill="#111111" stroke="#e63946" stroke-width="3" />
+                        <circle cx="208" cy="135" r="7" fill="#0a0a0a">
+                            <animateTransform attributeName="transform" type="rotate" from="0 208 135" to="360 208 135"
+                                dur="0.8s" repeatCount="indefinite" />
+                        </circle>
+                        <!-- Speed lines -->
+                        <line x1="0" y1="95" x2="30" y2="95" stroke="rgba(230,57,70,0.4)" stroke-width="2" />
+                        <line x1="0" y1="105" x2="22" y2="105" stroke="rgba(230,57,70,0.3)" stroke-width="2" />
+                        <line x1="0" y1="115" x2="18" y2="115" stroke="rgba(230,57,70,0.2)" stroke-width="2" />
+                    </svg>
+
+                    <div class="hero-card-info">
+                        <div class="ride-bar">
+                            <div class="ride-dot green"></div>
+                            <div>
+                                <div style="font-size:0.88rem;font-weight:600;">Shivajinagar Metro</div>
+                                <div class="ride-bar-label">Pickup</div>
+                            </div>
+                        </div>
+                        <div class="ride-bar">
+                            <div class="ride-dot red"></div>
+                            <div>
+                                <div style="font-size:0.88rem;font-weight:600;">Hinjewadi IT Park</div>
+                                <div class="ride-bar-label">Drop</div>
+                            </div>
+                        </div>
+                        <div class="fare-box">
+                            <div>
+                                <div class="fare-amount">₹240</div>
+                                <div class="fare-label">Estimated Fare</div>
+                            </div>
+                            <div style="text-align:right;">
+                                <div style="font-size:0.82rem;color:var(--accent);">🚗 Car · 12 km</div>
+                                <div style="font-size:0.78rem;color:var(--text-muted);margin-top:4px;">ETA ~18 mins
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ---- STATS STRIP ---- -->
+    <div class="stats-strip">
+        <div class="stats-strip-inner">
+            <div class="strip-stat">
+                <div class="num">50K+</div>
+                <div class="lbl">Happy Riders</div>
+            </div>
+            <div class="strip-stat">
+                <div class="num">5K+</div>
+                <div class="lbl">Verified Drivers</div>
+            </div>
+            <div class="strip-stat">
+                <div class="num">2M+</div>
+                <div class="lbl">Rides Completed</div>
+            </div>
+            <div class="strip-stat">
+                <div class="num">4.9⭐</div>
+                <div class="lbl">Average Rating</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ---- FEATURES ---- -->
+    <section class="features" id="features">
+        <h2 class="section-title">Why Choose PrimeLift?</h2>
+        <p class="section-sub">Everything you need for a perfect ride experience</p>
+
+        <div class="features-grid">
+            <div class="feature-card c1">
+                <span class="f-icon">⚡</span>
+                <div class="f-title">Instant Booking</div>
+                <div class="f-text">Book a ride in under 30 seconds. Drivers assigned automatically based on type and
+                    availability.</div>
+            </div>
+            <div class="feature-card c2">
+                <span class="f-icon">🛡️</span>
+                <div class="f-title">100% Safe Rides</div>
+                <div class="f-text">All drivers are verified. Real-time ride tracking and emergency support available
+                    24/7.</div>
+            </div>
+            <div class="feature-card c3">
+                <span class="f-icon">💰</span>
+                <div class="f-title">Transparent Pricing</div>
+                <div class="f-text">No hidden charges. Know your fare before you book. Multiple payment options
+                    available.</div>
+            </div>
+            <div class="feature-card c4">
+                <span class="f-icon">⭐</span>
+                <div class="f-title">Rated Experience</div>
+                <div class="f-text">Rate your driver and help the community. Only top-rated drivers stay on our
+                    platform.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ---- VEHICLES ---- -->
+    <section class="vehicles-section" id="vehicles">
+        <div class="vehicles-inner">
+            <h2 class="section-title">Choose Your Ride</h2>
+            <p class="section-sub">From quick bike rides to spacious SUVs — we have it all</p>
+
+            <div class="vehicles-grid">
+                <div class="v-card">
+                    <span class="v-emoji">🏍️</span>
+                    <div class="v-type">Bike</div>
+                    <div class="v-price">₹10 + ₹6/km</div>
+                    <div class="v-desc">Fastest for short distances. Beat traffic easily.</div>
+                </div>
+                <div class="v-card">
+                    <span class="v-emoji">🛺</span>
+                    <div class="v-type">Auto</div>
+                    <div class="v-price">₹15 + ₹9/km</div>
+                    <div class="v-desc">Classic & affordable. Perfect for city commutes.</div>
+                </div>
+                <div class="v-card">
+                    <span class="v-emoji">🚗</span>
+                    <div class="v-type">Car</div>
+                    <div class="v-price">₹20 + ₹12/km</div>
+                    <div class="v-desc">Comfortable AC car ride for you and friends.</div>
+                </div>
+                <div class="v-card">
+                    <span class="v-emoji">🚙</span>
+                    <div class="v-type">SUV</div>
+                    <div class="v-price">₹25 + ₹16/km</div>
+                    <div class="v-desc">Large family trips in premium luxury SUVs.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ---- CTA ---- -->
+    <section class="cta-section">
+        <h2 class="cta-title">Ready to Ride? 🚀</h2>
+        <p class="cta-sub">Join thousands of satisfied riders. Your first ride could be minutes away.</p>
+        <div class="cta-actions">
+            <a href="login.html?tab=register" class="btn btn-primary">🧑 Register as Rider</a>
+            <a href="login.html?tab=register&role=driver" class="btn btn-accent">🚗 Register as Driver</a>
+        </div>
+    </section>
+
+    <!-- ---- FOOTER ---- -->
+    <footer>
+        <div class="logo">🚗 PrimeLift</div>
+        <p>© 2024 PrimeLift. Fast, Safe & Affordable Rides.</p>
+        <p style="margin-top:8px;">
+            <a href="login.html" style="color:var(--primary);">Login</a> &nbsp;|&nbsp;
+            <a href="login.html?tab=register" style="color:var(--primary);">Register</a>
+        </p>
+    </footer>
+
+</body>
+
+</html>

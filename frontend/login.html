@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PrimeLift – Login / Register</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: radial-gradient(ellipse at 30% 50%, rgba(108, 99, 255, 0.12)0%, transparent 60%),
+                radial-gradient(ellipse at 70% 80%, rgba(0, 212, 170, 0.08)0%, transparent 60%), var(--bg);
+        }
+
+        .auth-container {
+            width: 100%;
+            max-width: 480px;
+            padding: 20px;
+        }
+
+        .auth-card {
+            background: var(--glass);
+            border: var(--glass-b);
+            border-radius: 24px;
+            padding: 36px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .auth-logo {
+            text-align: center;
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 6px;
+        }
+
+        .auth-subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.88rem;
+            margin-bottom: 28px;
+        }
+
+        .tab-btns {
+            display: flex;
+            gap: 0;
+            margin-bottom: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 11px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        /* Login method toggle */
+        .method-toggle {
+            display: flex;
+            gap: 0;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .method-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .method-btn.active {
+            background: rgba(0, 212, 170, 0.15);
+            color: var(--accent);
+            border-bottom: 2px solid var(--accent);
+        }
+
+        /* OTP input */
+        .otp-row {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin: 16px 0;
+        }
+
+        .otp-row input {
+            width: 44px;
+            height: 50px;
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: 700;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .otp-row input:focus {
+            border-color: var(--accent);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 212, 170, 0.15);
+        }
+
+        .resend-link {
+            color: var(--primary);
+            font-size: 0.82rem;
+            text-align: center;
+            display: block;
+            margin-top: 8px;
+            cursor: pointer;
+        }
+
+        /* Role buttons */
+        .role-select {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .role-btn {
+            flex: 1;
+            padding: 14px 10px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .role-btn.active {
+            border-color: var(--primary);
+            background: rgba(108, 99, 255, 0.12);
+            color: var(--text);
+        }
+
+        .forgot-link {
+            color: var(--primary);
+            font-size: 0.82rem;
+            text-align: right;
+            display: block;
+            margin-top: -8px;
+            margin-bottom: 14px;
+            cursor: pointer;
+        }
+
+        #driver-extra {
+            display: none;
+        }
+
+        #msg {
+            min-height: 20px;
+            margin-bottom: 8px;
+        }
+
+        .demo-box {
+            margin-top: 14px;
+            padding: 12px;
+            background: rgba(108, 99, 255, 0.06);
+            border-radius: 10px;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        .demo-box strong {
+            color: var(--text);
+        }
+
+        .phone-input-wrap {
+            display: flex;
+            align-items: center;
+            gap: 0;
+        }
+
+        .phone-prefix {
+            padding: 10px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-right: none;
+            border-radius: 8px 0 0 8px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .phone-prefix+input {
+            border-radius: 0 8px 8px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="auth-container">
+        <div style="text-align:center;margin-bottom:16px;"><a href="index.html"
+                style="color:var(--text-muted);font-size:0.85rem;">← Back to Home</a></div>
+        <div class="auth-card">
+            <div class="auth-logo">🚗 PrimeLift</div>
+            <div class="auth-subtitle">Fast, Safe & Affordable Rides</div>
+
+            <!-- Top Tabs: Login / Register -->
+            <div class="tab-btns">
+                <button class="tab-btn active" id="loginTab" onclick="switchTab('login')">Sign In</button>
+                <button class="tab-btn" id="registerTab" onclick="switchTab('register')">Register</button>
+            </div>
+
+            <div id="msg"></div>
+
+            <!-- ===== LOGIN FORM ===== -->
+            <div id="loginForm">
+                <!-- Login method toggle -->
+                <div class="method-toggle">
+                    <button class="method-btn active" onclick="switchLoginMethod('email')">📧 Email</button>
+                    <button class="method-btn" onclick="switchLoginMethod('otp')">📱 Mobile OTP</button>
+                </div>
+
+                <!-- Email/Password Login -->
+                <form id="emailLogin" onsubmit="handleEmailLogin(event)">
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" id="loginEmail" class="form-control" placeholder="Enter your email"
+                            required />
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="loginPassword" class="form-control" placeholder="Enter your password"
+                            required />
+                    </div>
+                    <a class="forgot-link">Forgot password?</a>
+                    <button type="submit" class="btn btn-primary btn-full" id="emailLoginBtn">Sign In</button>
+                </form>
+
+                <!-- OTP Login -->
+                <div id="otpLogin" style="display:none;">
+                    <div id="otpStep1">
+                        <div class="form-group">
+                            <label>📱 Mobile Number</label>
+                            <div class="phone-input-wrap">
+                                <span class="phone-prefix">+91</span>
+                                <input type="tel" id="otpPhone" class="form-control" placeholder="Enter 10-digit mobile"
+                                    maxlength="10" style="flex:1;" />
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-accent btn-full" onclick="sendOTP()" id="sendOtpBtn">Send
+                            OTP</button>
+                    </div>
+                    <div id="otpStep2" style="display:none;">
+                        <div style="text-align:center;color:var(--text-muted);font-size:0.85rem;margin-bottom:12px;">
+                            Enter the 6-digit OTP sent to <strong id="otpPhoneDisplay">—</strong>
+                        </div>
+                        <div class="otp-row" id="otpInputs">
+                            <input type="text" maxlength="1" oninput="otpNext(this,1)" />
+                            <input type="text" maxlength="1" oninput="otpNext(this,2)" />
+                            <input type="text" maxlength="1" oninput="otpNext(this,3)" />
+                            <input type="text" maxlength="1" oninput="otpNext(this,4)" />
+                            <input type="text" maxlength="1" oninput="otpNext(this,5)" />
+                            <input type="text" maxlength="1" oninput="otpNext(this,null)" />
+                        </div>
+                        <div id="otpDemo"
+                            style="text-align:center;font-size:0.82rem;color:var(--accent);margin-bottom:10px;"></div>
+                        <button class="btn btn-primary btn-full" onclick="verifyOTP()" id="verifyOtpBtn">Verify &
+                            Login</button>
+                        <a class="resend-link" onclick="sendOTP()">Resend OTP</a>
+                    </div>
+                </div>
+
+                <div class="demo-box">
+                    <strong>Demo Accounts:</strong><br />
+                    Admin: admin@ride.com / password<br />
+                    Rider: rider@ride.com / password<br />
+                    Driver: driver@ride.com / password<br />
+                    <em>OTP: any 10-digit number, OTP shown in console</em>
+                </div>
+            </div>
+
+            <!-- ===== REGISTER FORM ===== -->
+            <form id="registerForm" style="display:none;" onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label>I want to</label>
+                    <div class="role-select">
+                        <button type="button" class="role-btn active" id="riderBtn" onclick="selectRole('rider')">🧑
+                            Ride</button>
+                        <button type="button" class="role-btn" id="driverBtn" onclick="selectRole('driver')">🚗 Drive &
+                            Earn</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="regName" class="form-control" placeholder="Your full name" required />
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="regEmail" class="form-control" placeholder="Enter email" required />
+                </div>
+                <div class="form-group">
+                    <label>Mobile Number</label>
+                    <div class="phone-input-wrap">
+                        <span class="phone-prefix">+91</span>
+                        <input type="tel" id="regPhone" class="form-control" placeholder="10-digit mobile"
+                            maxlength="10" required style="flex:1;" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Gender</label>
+                    <select id="regGender" class="form-control">
+                        <option value="">Select gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="regPassword" class="form-control"
+                        placeholder="Create a password (min 6 chars)" required />
+                </div>
+
+                <div id="driver-extra">
+                    <div class="form-group">
+                        <label>Vehicle Type</label>
+                        <select id="vehicleType" class="form-control">
+                            <option value="bike">🏍️ Bike</option>
+                            <option value="auto">🛺 Auto</option>
+                            <option value="car" selected>🚗 Car (Mini)</option>
+                            <option value="suv">🚙 SUV (Prime)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Vehicle Number</label>
+                        <input type="text" id="vehicleNo" class="form-control" placeholder="e.g. MH12AB1234" />
+                    </div>
+                    <div class="form-group">
+                        <label>Vehicle Model</label>
+                        <input type="text" id="vehicleModel" class="form-control" placeholder="e.g. Swift Dzire" />
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-full" id="registerBtn">Create Account</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API = window.location.origin + '/api';
+        let selectedRole = 'rider';
+        let sentOtp = '';
+
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('tab') === 'register') switchTab('register');
+        if (params.get('role') === 'driver') selectRole('driver');
+
+        function switchTab(tab) {
+            document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
+            document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
+            document.getElementById('loginTab').classList.toggle('active', tab === 'login');
+            document.getElementById('registerTab').classList.toggle('active', tab === 'register');
+            clearMsg();
+        }
+
+        function switchLoginMethod(method) {
+            document.querySelectorAll('.method-btn').forEach((b, i) => b.classList.toggle('active', (i === 0 && method === 'email') || (i === 1 && method === 'otp')));
+            document.getElementById('emailLogin').style.display = method === 'email' ? 'block' : 'none';
+            document.getElementById('otpLogin').style.display = method === 'otp' ? 'block' : 'none';
+        }
+
+        function selectRole(role) {
+            selectedRole = role;
+            document.getElementById('riderBtn').classList.toggle('active', role === 'rider');
+            document.getElementById('driverBtn').classList.toggle('active', role === 'driver');
+            document.getElementById('driver-extra').style.display = role === 'driver' ? 'block' : 'none';
+        }
+
+        function showMsg(text, type = 'info') { document.getElementById('msg').innerHTML = `<div class="alert alert-${type}">${text}</div>`; }
+        function clearMsg() { document.getElementById('msg').innerHTML = ''; }
+        function setLoading(btnId, loading, label = 'Sign In') { const b = document.getElementById(btnId); b.disabled = loading; b.innerHTML = loading ? '<span class="spinner"></span> Please wait...' : label; }
+
+        // === EMAIL LOGIN ===
+        async function handleEmailLogin(e) {
+            e.preventDefault(); clearMsg(); setLoading('emailLoginBtn', true, 'Sign In');
+            try {
+                const res = await fetch(`${API}/auth/login`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: document.getElementById('loginEmail').value, password: document.getElementById('loginPassword').value })
+                });
+                const data = await res.json();
+                if (!data.success) { showMsg(data.message, 'danger'); return; }
+                loginSuccess(data);
+            } catch (e) { showMsg('Cannot connect to server.', 'danger'); }
+            finally { setLoading('emailLoginBtn', false, 'Sign In'); }
+        }
+
+        // === OTP LOGIN ===
+        function otpNext(el, nextIdx) { if (el.value.length === 1 && nextIdx !== null) { document.getElementById('otpInputs').children[nextIdx].focus(); } }
+
+        async function sendOTP() {
+            const phone = document.getElementById('otpPhone').value.trim();
+            if (phone.length < 10) { showMsg('Enter valid 10-digit number.', 'danger'); return; }
+            setLoading('sendOtpBtn', true, 'Send OTP');
+            try {
+                const res = await fetch(`${API}/auth/send-otp`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phone }) });
+                const data = await res.json();
+                if (!data.success) { showMsg(data.message, 'danger'); return; }
+                sentOtp = data.demo_otp || '';
+                document.getElementById('otpStep1').style.display = 'none';
+                document.getElementById('otpStep2').style.display = 'block';
+                document.getElementById('otpPhoneDisplay').textContent = '+91 ' + phone;
+                if (sentOtp) document.getElementById('otpDemo').textContent = `Demo OTP: ${sentOtp}`;
+                showMsg('OTP sent successfully!', 'success');
+            } catch (e) { showMsg('Connection error.', 'danger'); } finally { setLoading('sendOtpBtn', false, 'Send OTP'); }
+        }
+
+        async function verifyOTP() {
+            const phone = document.getElementById('otpPhone').value.trim();
+            const inputs = document.getElementById('otpInputs').querySelectorAll('input');
+            const otp = Array.from(inputs).map(i => i.value).join('');
+            if (otp.length < 6) { showMsg('Enter complete 6-digit OTP.', 'danger'); return; }
+            setLoading('verifyOtpBtn', true, 'Verify & Login');
+            try {
+                const res = await fetch(`${API}/auth/verify-otp`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phone, otp }) });
+                const data = await res.json();
+                if (!data.success) { showMsg(data.message, 'danger'); return; }
+                loginSuccess(data);
+            } catch (e) { showMsg('Connection error.', 'danger'); } finally { setLoading('verifyOtpBtn', false, 'Verify & Login'); }
+        }
+
+        // === REGISTER ===
+        async function handleRegister(e) {
+            e.preventDefault(); clearMsg(); setLoading('registerBtn', true, 'Create Account');
+            try {
+                const body = {
+                    name: document.getElementById('regName').value,
+                    email: document.getElementById('regEmail').value,
+                    phone: document.getElementById('regPhone').value,
+                    password: document.getElementById('regPassword').value,
+                    gender: document.getElementById('regGender').value,
+                    role: selectedRole
+                };
+                if (selectedRole === 'driver') {
+                    body.vehicle_type = document.getElementById('vehicleType').value;
+                    body.vehicle_no = document.getElementById('vehicleNo').value;
+                    body.vehicle_model = document.getElementById('vehicleModel').value;
+                }
+                const res = await fetch(`${API}/auth/register`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+                const data = await res.json();
+                if (!data.success) { showMsg(data.message, 'danger'); return; }
+                loginSuccess(data, true);
+            } catch (e) { showMsg('Cannot connect to server.', 'danger'); } finally { setLoading('registerBtn', false, 'Create Account'); }
+        }
+
+        function loginSuccess(data, isNew = false) {
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('user', JSON.stringify(data.user));
+            showMsg(isNew ? 'Account created! Redirecting...' : 'Login successful! Redirecting...', 'success');
+            setTimeout(() => {
+                const role = data.user.role;
+                if (role === 'admin') window.location.href = 'admin-dashboard.html';
+                else if (role === 'driver') window.location.href = 'driver-dashboard.html';
+                else window.location.href = 'rider-dashboard.html';
+            }, 800);
+        }
+    </script>
+</body>
+
+</html>
