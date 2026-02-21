@@ -2,11 +2,41 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
 const db = require('../config/db');
 const auth = require('../middleware/auth');
 
-// Store OTPs in memory (in production use Redis)
+// Store OTPs in memory (use Redis in production)
 const otpStore = {};
+
+// Gmail SMTP transporter
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_APP_PASSWORD
+    }
+});
+
+async function sendOtpEmail(toEmail, otp) {
+    await transporter.sendMail({
+        from: `"PrimeLift" <${process.env.GMAIL_USER}>`,
+        to: toEmail,
+        subject: '🚗 Your PrimeLift OTP Code',
+        html: `
+      <div style="font-family:Arial,sans-serif;max-width:480px;margin:auto;background:#0f172a;color:#fff;border-radius:16px;padding:32px;">
+        <h2 style="color:#6366f1;margin:0 0 8px">🚗 PrimeLift</h2>
+        <p style="color:#94a3b8;margin:0 0 24px">Your One-Time Password</p>
+        <div style="background:#1e293b;border-radius:12px;padding:24px;text-align:center;margin-bottom:24px;">
+          <span style="font-size:40px;font-weight:bold;letter-spacing:12px;color:#6366f1">${otp}</span>
+        </div>
+        <p style="color:#94a3b8;font-size:13px;">This OTP is valid for <strong style="color:#fff">5 minutes</strong>. Do not share it with anyone.</p>
+        <hr style="border-color:#1e293b;margin:24px 0">
+        <p style="color:#475569;font-size:12px;text-align:center">© ${new Date().getFullYear()} PrimeLift — Ride Smart</p>
+      </div>
+    `
+    });
+}
 
 // POST /api/auth/register
 router.post('/register', async (req, res) => {
@@ -122,74 +152,78 @@ router.post('/login', async (req, res) => {
     }
 });
 
-// POST /api/auth/send-otp  (mobile OTP login)
+// POST /api/auth/send-otp  (email OTP login — free via Gmail)
 router.post('/send-otp', async (req, res) => {
     try {
-        const { phone } = req.body;
-        if (!phone || phone.length < 10) {
-            return res.status(400).json({ success: false, message: 'Valid phone number required.' });
+        const { phone, email } = req.body;
+
+        // Accept either phone number or email
+        let targetEmail = email;
+        if (!targetEmail && phone) {
+            // Look up the registered email for this phone number
+            const [users] = await db.query('SELECT email FROM users WHERE phone = ?', [phone]);
+            if (users.length === 0) {
+                return res.status(404).json({ success: false, message: 'No account found with this phone. Please register first.' });
+            }
+            targetEmail = users[0].email;
+        }
+
+        if (!targetEmail) {
+            return res.status(400).json({ success: false, message: 'Email or phone number is required.' });
         }
 
         // Generate 6-digit OTP
         const otp = String(Math.floor(100000 + Math.random() * 900000));
-        otpStore[phone] = { otp, expires: Date.now() + 5 * 60 * 1000 }; // 5 min expiry
+        const key = phone || targetEmail;
+        otpStore[key] = { otp, email: targetEmail, expires: Date.now() + 5 * 60 * 1000 };
 
-        // In production: send real SMS via Twilio/MSG91
-        console.log(`📱 OTP for ${phone}: ${otp}`);
+        // Send real OTP email via Gmail (free)
+        await sendOtpEmail(targetEmail, otp);
+        console.log(`📧 OTP sent to ${targetEmail}`);
 
         res.json({
             success: true,
-            message: 'OTP sent successfully!',
-            // Remove demo_otp in production!
-            demo_otp: otp
+            message: `OTP sent to your email (${targetEmail.replace(/(.{2}).+(@.+)/, '$1***$2')})!`
         });
 
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ success: false, message: 'Server error.' });
+        console.error('OTP send error:', err);
+        res.status(500).json({ success: false, message: 'Failed to send OTP. Check email config.' });
     }
 });
 
 // POST /api/auth/verify-otp
 router.post('/verify-otp', async (req, res) => {
     try {
-        const { phone, otp } = req.body;
-        if (!phone || !otp) {
-            return res.status(400).json({ success: false, message: 'Phone and OTP required.' });
+        const { phone, email, otp } = req.body;
+        const key = phone || email;
+        if (!key || !otp) {
+            return res.status(400).json({ success: false, message: 'Phone/email and OTP required.' });
         }
 
-        const stored = otpStore[phone];
+        const stored = otpStore[key];
         if (!stored || stored.otp !== otp) {
-            return res.status(401).json({ success: false, message: 'Invalid OTP.' });
+            return res.status(401).json({ success: false, message: 'Invalid OTP. Please try again.' });
         }
         if (Date.now() > stored.expires) {
-            delete otpStore[phone];
+            delete otpStore[key];
             return res.status(401).json({ success: false, message: 'OTP expired. Request a new one.' });
         }
 
-        delete otpStore[phone]; // clear used OTP
+        delete otpStore[key]; // clear used OTP
 
-        // Find or create user
-        let [users] = await db.query('SELECT * FROM users WHERE phone = ?', [phone]);
+        // Find user by phone or email
+        const lookupField = phone ? 'phone' : 'email';
+        const lookupValue = phone || email;
+        let [users] = await db.query(`SELECT * FROM users WHERE ${lookupField} = ?`, [lookupValue]);
         let user;
 
         if (users.length === 0) {
-            // Auto-register with phone
-            const tempPass = await bcrypt.hash(phone + '_ridego_temp', 10);
-            const [result] = await db.query(
-                'INSERT INTO users (name, email, password, phone, role) VALUES (?, ?, ?, ?, ?)',
-                [`Rider_${phone.slice(-4)}`, `${phone}@ridego.temp`, tempPass, phone, 'rider']
-            );
-            user = { id: result.insertId, name: `Rider_${phone.slice(-4)}`, email: `${phone}@ridego.temp`, phone, role: 'rider', is_new: true };
-
-            await db.query(
-                'INSERT INTO notifications (user_id, title, message, type) VALUES (?, ?, ?, ?)',
-                [user.id, 'Welcome to PrimeLift! 🚗', 'Complete your profile for a better experience.', 'system']
-            );
+            return res.status(404).json({ success: false, message: 'No account found. Please register first.' });
         } else {
             user = users[0];
             if (!user.is_active) {
-                return res.status(403).json({ success: false, message: 'Account disabled.' });
+                return res.status(403).json({ success: false, message: 'Account disabled. Contact support.' });
             }
         }
 
@@ -199,9 +233,15 @@ router.post('/verify-otp', async (req, res) => {
             { expiresIn: process.env.JWT_EXPIRES_IN }
         );
 
+        let driverInfo = null;
+        if (user.role === 'driver') {
+            const [drows] = await db.query('SELECT * FROM drivers WHERE user_id = ?', [user.id]);
+            if (drows.length > 0) driverInfo = drows[0];
+        }
+
         res.json({
-            success: true, message: 'OTP verified!', token,
-            user: { id: user.id, name: user.name, email: user.email, phone: user.phone, role: user.role, is_new: user.is_new || false }
+            success: true, message: 'Login successful!', token,
+            user: { id: user.id, name: user.name, email: user.email, phone: user.phone, role: user.role, driver: driverInfo }
         });
 
     } catch (err) {
