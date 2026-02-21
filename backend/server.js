@@ -6,7 +6,13 @@ const path = require('path');
 const app = express();
 
 // ---- Middleware ----
-app.use(cors());
+app.use(cors({
+    origin: '*', // Allow all for now to ensure it works, then we can restrict if needed
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+}));
+app.options('*', cors()); // Enable pre-flight for all routes
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
