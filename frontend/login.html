@@ -373,7 +373,7 @@
     </div>
 
     <script>
-        const API = window.location.origin + '/api';
+        const API = window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : 'https://primelift-api-production.up.railway.app/api';
         let selectedRole = 'rider';
         let sentOtp = '';
 
