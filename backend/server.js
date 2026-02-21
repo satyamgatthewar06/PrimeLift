@@ -6,6 +6,7 @@ const path = require('path');
 const app = express();
 
 // ---- Middleware ----
+// Allow specific origins but reflect them in the header to support credentials
 const allowedOrigins = [
     'https://primelift-app.netlify.app',
     'http://localhost:5500',
@@ -15,17 +16,19 @@ const allowedOrigins = [
 
 app.use(cors({
     origin: function (origin, callback) {
-        // allow requests with no origin (like mobile apps or curl requests)
+        // Allow requests with no origin (like mobile apps)
         if (!origin) return callback(null, true);
-        if (allowedOrigins.indexOf(origin) === -1) {
-            const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-            return callback(new Error(msg), false);
+
+        if (allowedOrigins.indexOf(origin) !== -1 || origin.endsWith('.netlify.app')) {
+            callback(null, true);
+        } else {
+            // Instead of an error, just send false to deny CORS without crashing
+            callback(null, false);
         }
-        return callback(null, true);
     },
+    credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.options('*', cors()); // Enable pre-flight for all routes
 app.use(express.json());
@@ -42,7 +45,12 @@ app.use('/api/admin', require('./routes/admin'));
 
 // ---- Health Check ----
 app.get('/api/health', (req, res) => {
-    res.json({ success: true, message: '🚗 RideBooking API is running!', time: new Date() });
+    res.json({
+        success: true,
+        message: '🚗 PrimeLift API is running!',
+        version: '1.0.3-cors-fix',
+        time: new Date()
+    });
 });
 
 // ---- Catch-all: serve frontend ----
